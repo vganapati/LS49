@@ -191,7 +191,7 @@ def run_sim2smv(prefix,crystal,spectra,rotation,params,
   SIM.flux=1e12
   SIM.beamsize_mm=0.003 # square (not user specified)
   SIM.exposure_s=1.0 # multiplies flux x exposure
-  SIM.add_background(sort_stable=(add_background_algorithm=="sort_stable"))
+  SIM.add_background()
 
   SIM.Fbg_vs_stol = air_bg
   SIM.amorphous_sample_thick_mm = 10 # between beamstop and collimator
