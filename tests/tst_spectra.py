@@ -8,3 +8,7 @@ Created on Fri Nov  4 14:38:19 2022
 
 from LS49_pytorch.spectra.generate_spectra import spectra_simulation
 SS = spectra_simulation()
+print(SS)
+print(SS.N)
+print(SS.R["spectra"][0])
+print(SS.R["spectra"])
