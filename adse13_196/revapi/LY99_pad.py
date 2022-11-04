@@ -197,7 +197,7 @@ def run_sim2smv(prefix,crystal,spectra,rotation,params,
   SIM.amorphous_sample_thick_mm = 10 # between beamstop and collimator
   SIM.amorphous_density_gcm3 = 1.2e-3
   SIM.amorphous_sample_molecular_weight_Da = 28 # nitrogen = N2
-  SIM.add_background(sort_stable=(add_background_algorithm=="sort_stable"))
+  SIM.add_background(sort_stable=())
 
   if params.psf:
     SIM.detector_psf_kernel_radius_pixels=10;
