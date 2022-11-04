@@ -45,3 +45,8 @@ export OMP_NUM_THREADS=24
 srun -n 1 -c 10 libtbx.run_tests_parallel nproc=Auto module=LS49 module=simtbx
 ```
 
+### Notes for machine learning scripts
+
+conda activate pytorch
+navigate to the folder containing the LS49_pytorch directory
+export PYTHONPATH=$PYTHONPATH:$(pwd)
