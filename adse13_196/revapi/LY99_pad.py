@@ -4,8 +4,6 @@ from scitbx.array_family import flex
 from scitbx.matrix import sqr,col
 from simtbx.nanoBragg import shapetype
 from simtbx.nanoBragg import nanoBragg
-import libtbx.load_env # possibly implicit
-from cctbx import crystal
 import math
 import scitbx
 import os
@@ -70,16 +68,12 @@ def basic_detector(): # from development, not actually used here but useful for 
 from LS49.sim.debug_utils import channel_extractor
 CHDBG_singleton = channel_extractor()
 
-def run_sim2smv(prefix,crystal,spectra,rotation,rank,gpu_channels_singleton,params,
-                quick=False,save_bragg=False,sfall_channels=None):
+def run_sim2smv(prefix,crystal,spectra,rotation,params,
+                quick=True,save_bragg=False,sfall_channels=None):
   smv_fileout = prefix + ".img"
   burst_buffer_expand_dir = os.path.expandvars(params.logger.outdir)
   burst_buffer_fileout = os.path.join(burst_buffer_expand_dir,smv_fileout)
   reference_fileout = os.path.join(".",smv_fileout)
-  if not quick:
-    if not write_safe(reference_fileout):
-      print("File %s already exists, skipping in rank %d"%(reference_fileout,rank))
-      return
 
   direct_algo_res_limit = 1.7
 
@@ -161,85 +155,49 @@ def run_sim2smv(prefix,crystal,spectra,rotation,rank,gpu_channels_singleton,para
   # amplify spot signal to simulate physical crystal of 4000x larger: 100 um (64e9 x the volume)
   SIM.raw_pixels *= crystal.domains_per_crystal; # must calculate the correct scale!
 
-  QQ = Profiler("nanoBragg Bragg spots rank %d"%(rank))
   if True:
     #something new
-    devices_per_node = int(os.environ["DEVICES_PER_NODE"])
-    SIM.device_Id = rank%devices_per_node
-
-    assert gpu_channels_singleton.get_deviceID()==SIM.device_Id
-    if gpu_channels_singleton.get_nchannels() == 0: # if uninitialized
-        P = Profiler("Initialize the channels singleton rank %d"%(rank))
-        for x in range(len(flux)):
-          gpu_channels_singleton.structure_factors_to_GPU_direct(
-           x, sfall_channels[x].indices(), sfall_channels[x].data())
-        del P
-        import time
-        print("datetime for channels singleton rank %d"%(rank),time.time())
-
-    exascale_api = get_exascale("exascale_api", params.context)
-    gpud = get_exascale("gpu_detector", params.context)
-
-    gpu_simulation = exascale_api(nanoBragg = SIM)
-    gpu_simulation.allocate()
-
-    gpu_detector = gpud(deviceId=SIM.device_Id, nanoBragg=SIM)
-    gpu_detector.each_image_allocate()
 
     # loop over energies
     for x in range(len(flux)):
-      P = Profiler("USE_EXASCALE_API nanoBragg Python and C++ rank %d"%(rank))
 
-      print("USE_EXASCALE_API+++++++++++++++++++++++ Wavelength",x)
       # from channel_pixels function
       SIM.wavelength_A = wavlen[x]
       SIM.flux = flux[x]
-      gpu_simulation.add_energy_channel_from_gpu_amplitudes(
-        x, gpu_channels_singleton, gpu_detector)
-      del P
-    gpu_detector.scale_in_place(crystal.domains_per_crystal) # apply scale directly on GPU
+      
+      # XXX
+      # gpu_simulation.add_energy_channel_from_gpu_amplitudes(
+      #   x, gpu_channels_singleton, gpu_detector)
+
+    # XXX
+    # gpu_detector.scale_in_place(crystal.domains_per_crystal) # apply scale directly on GPU
+    
     SIM.wavelength_A = wavelength_A # return to canonical energy for subsequent background
 
-    if add_background_algorithm == "cuda":
-      QQ = Profiler("nanoBragg background rank %d"%(rank))
-      SIM.Fbg_vs_stol = water_bg
-      SIM.amorphous_sample_thick_mm = 0.1
-      SIM.amorphous_density_gcm3 = 1
-      SIM.amorphous_molecular_weight_Da = 18
-      SIM.flux=1e12
-      SIM.beamsize_mm=0.003 # square (not user specified)
-      SIM.exposure_s=1.0 # multiplies flux x exposure
-      gpu_simulation.add_background(gpu_detector)
-      SIM.Fbg_vs_stol = air_bg
-      SIM.amorphous_sample_thick_mm = 10 # between beamstop and collimator
-      SIM.amorphous_density_gcm3 = 1.2e-3
-      SIM.amorphous_sample_molecular_weight_Da = 28 # nitrogen = N2
-      gpu_simulation.add_background(gpu_detector)
+
 
     # deallocate GPU arrays
-    gpu_detector.write_raw_pixels(SIM)  # updates SIM.raw_pixels from GPU
-    gpu_detector.each_image_free()
+    
+    # XXX
+    # gpu_detector.write_raw_pixels(SIM)  # updates SIM.raw_pixels from GPU
+    # XXX
+    # gpu_detector.each_image_free()
     SIM.Amatrix_RUB = Amatrix_rot # return to canonical orientation
-    del QQ
 
-  if add_background_algorithm in ["jh","sort_stable"]:
-    QQ = Profiler("nanoBragg background rank %d"%(rank))
+  SIM.Fbg_vs_stol = water_bg
+  SIM.amorphous_sample_thick_mm = 0.1
+  SIM.amorphous_density_gcm3 = 1
+  SIM.amorphous_molecular_weight_Da = 18
+  SIM.flux=1e12
+  SIM.beamsize_mm=0.003 # square (not user specified)
+  SIM.exposure_s=1.0 # multiplies flux x exposure
+  SIM.add_background(sort_stable=(add_background_algorithm=="sort_stable"))
 
-    SIM.Fbg_vs_stol = water_bg
-    SIM.amorphous_sample_thick_mm = 0.1
-    SIM.amorphous_density_gcm3 = 1
-    SIM.amorphous_molecular_weight_Da = 18
-    SIM.flux=1e12
-    SIM.beamsize_mm=0.003 # square (not user specified)
-    SIM.exposure_s=1.0 # multiplies flux x exposure
-    SIM.add_background(sort_stable=(add_background_algorithm=="sort_stable"))
-
-    SIM.Fbg_vs_stol = air_bg
-    SIM.amorphous_sample_thick_mm = 10 # between beamstop and collimator
-    SIM.amorphous_density_gcm3 = 1.2e-3
-    SIM.amorphous_sample_molecular_weight_Da = 28 # nitrogen = N2
-    SIM.add_background(sort_stable=(add_background_algorithm=="sort_stable"))
-    del QQ
+  SIM.Fbg_vs_stol = air_bg
+  SIM.amorphous_sample_thick_mm = 10 # between beamstop and collimator
+  SIM.amorphous_density_gcm3 = 1.2e-3
+  SIM.amorphous_sample_molecular_weight_Da = 28 # nitrogen = N2
+  SIM.add_background(sort_stable=(add_background_algorithm=="sort_stable"))
 
   if params.psf:
     SIM.detector_psf_kernel_radius_pixels=10;
@@ -256,7 +214,6 @@ def run_sim2smv(prefix,crystal,spectra,rotation,rank,gpu_channels_singleton,para
     SIM.detector_calibration_noise_pct = 1.0
     SIM.readout_noise_adu = 1.
 
-  QQ = Profiler("nanoBragg noise rank %d"%(rank))
   if params.noise or params.psf:
     from LS49.sim.step6_pad import estimate_gain
     print("quantum_gain=",SIM.quantum_gain) #defaults to 1. converts photons to ADU
@@ -273,15 +230,17 @@ def run_sim2smv(prefix,crystal,spectra,rotation,rank,gpu_channels_singleton,para
     SIM.add_noise() #converts photons to ADU.
     #estimate_gain(SIM.raw_pixels,offset=SIM.adc_offset_adu,algorithm="slow")
     #estimate_gain(SIM.raw_pixels,offset=SIM.adc_offset_adu,algorithm="kabsch")
-  del QQ
 
   print ("FULLY")
   print(burst_buffer_expand_dir, params.logger.outdir)
   print(burst_buffer_fileout, smv_fileout)
 
 
-  extra = "PREFIX=%s;\nRANK=%d;\n"%(prefix,rank)
+  extra = "PREFIX=%s;\n"%(prefix)
   SIM.to_smv_format_py(fileout=burst_buffer_fileout,intfile_scale=1,rotmat=True,extra=extra,gz=True)
 
   SIM.free_all()
+  print(SIM)
+
+
 
