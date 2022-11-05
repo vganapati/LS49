@@ -37,7 +37,7 @@ if __name__=="__main__":
   comm = MPI.COMM_WORLD
   rank = comm.Get_rank()
   size = comm.Get_size()
-  N_total = 100000 # number of items to simulate
+  N_total = 1 # number of items to simulate
   N_stride = size # total number of worker tasks
   print("hello from rank %d of %d"%(rank,size),"with omp_threads=",omp_get_num_procs())
   if rank == 0:

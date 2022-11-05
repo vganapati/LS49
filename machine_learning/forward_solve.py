@@ -32,3 +32,7 @@ plt.show()
 from LS49_pytorch.spectra.generate_spectra import spectra_simulation
 SS = spectra_simulation()
 print(SS)
+
+R = pickle.load(open(os.path.join(ls49_big_data,"data/spectra209.pickle"),"rb"),**kwargs_p)
+
+

@@ -108,6 +108,8 @@ def run_LY99_batch(test_without_mpi=False):
                      label_has="FE2",tables=local_data.get("Fe_reduced_model"),newvalue=wavlen[x])
     sfall_channels[x]=GF.get_amplitudes()
 
+  print('sfall_channels')
+  print(sfall_channels.shape)
 
 
   from LS49.spectra.generate_spectra import spectra_simulation

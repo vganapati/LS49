@@ -155,34 +155,33 @@ def run_sim2smv(prefix,crystal,spectra,rotation,params,
   # amplify spot signal to simulate physical crystal of 4000x larger: 100 um (64e9 x the volume)
   SIM.raw_pixels *= crystal.domains_per_crystal; # must calculate the correct scale!
 
-  if True:
-    #something new
+  #something new
 
-    # loop over energies
-    for x in range(len(flux)):
+  # loop over energies
+  for x in range(len(flux)):
 
-      # from channel_pixels function
-      SIM.wavelength_A = wavlen[x]
-      SIM.flux = flux[x]
-      
-      # XXX
-      # gpu_simulation.add_energy_channel_from_gpu_amplitudes(
-      #   x, gpu_channels_singleton, gpu_detector)
-
-    # XXX
-    # gpu_detector.scale_in_place(crystal.domains_per_crystal) # apply scale directly on GPU
-    
-    SIM.wavelength_A = wavelength_A # return to canonical energy for subsequent background
-
-
-
-    # deallocate GPU arrays
+    # from channel_pixels function
+    SIM.wavelength_A = wavlen[x]
+    SIM.flux = flux[x]
     
     # XXX
-    # gpu_detector.write_raw_pixels(SIM)  # updates SIM.raw_pixels from GPU
-    # XXX
-    # gpu_detector.each_image_free()
-    SIM.Amatrix_RUB = Amatrix_rot # return to canonical orientation
+    # gpu_simulation.add_energy_channel_from_gpu_amplitudes(
+    #   x, gpu_channels_singleton, gpu_detector)
+
+  # XXX
+  # gpu_detector.scale_in_place(crystal.domains_per_crystal) # apply scale directly on GPU
+  
+  SIM.wavelength_A = wavelength_A # return to canonical energy for subsequent background
+
+
+
+  # deallocate GPU arrays
+  
+  # XXX
+  # gpu_detector.write_raw_pixels(SIM)  # updates SIM.raw_pixels from GPU
+  # XXX
+  # gpu_detector.each_image_free()
+  SIM.Amatrix_RUB = Amatrix_rot # return to canonical orientation
 
   SIM.Fbg_vs_stol = water_bg
   SIM.amorphous_sample_thick_mm = 0.1
