@@ -1,8 +1,6 @@
 from __future__ import division, print_function
 from six.moves import range
 from scitbx.matrix import sqr
-import libtbx.load_env # possibly implicit
-from cctbx import crystal
 from time import time
 from omptbx import omp_get_num_procs
 
