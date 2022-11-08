@@ -3,7 +3,7 @@
 #SBATCH -J kokkos_migration
 #SBATCH -A m3562_g       # allocation
 #SBATCH -C gpu
-#SBATCH -q debug # regular or special queue
+#SBATCH -q regular # regular or special queue
 #SBATCH -t 00:10:00      # wall clock time limit
 #SBATCH --gpus-per-node 1
 #SBATCH -o job%j.out
