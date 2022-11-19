@@ -210,6 +210,7 @@ def run_LY99_batch(test_without_mpi=False):
   if rank_profile:
     pr.disable()
     pr.dump_stats("cpu_%d.prof"%rank)
+  breakpoint()
 
 if __name__=="__main__":
   run_LY99_batch()
