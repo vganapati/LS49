@@ -90,6 +90,8 @@ def run_sim2smv(prefix,crystal,spectra,rotation,rank,gpu_channels_singleton,para
   # use crystal structure to initialize Fhkl array
   N = crystal.number_of_cells(sfall_channels[0].unit_cell())
 
+
+  # XXX STOPPED HERE 11/21/22
   #SIM = nanoBragg(detpixels_slowfast=(2000,2000),pixel_size_mm=0.11,Ncells_abc=(5,5,5),verbose=0)
   SIM = nanoBragg(detpixels_slowfast=(3840,3840),pixel_size_mm=0.088,Ncells_abc=(N,N,N),
     # workaround for problem with wavelength array, specify it separately in constructor.

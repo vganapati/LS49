@@ -86,7 +86,7 @@ def tst_one(image,spectra,crystal,random_orientation,sfall_channels,gpu_channels
               sfall_channels=sfall_channels,params=params)
 
 def run_LY99_batch(test_without_mpi=False):
-  __import__("IPython").embed()
+  breakpoint()
   params,options = parse_input()
   log_by_rank = bool(int(os.environ.get("LOG_BY_RANK",0)))
   rank_profile = bool(int(os.environ.get("RANK_PROFILE",1)))
@@ -135,11 +135,76 @@ def run_LY99_batch(test_without_mpi=False):
     if x%size != rank: continue
 
     GF.reset_wavelength(wavlen[x])
+    #XXX it appears as if there are 2 of each iron atom?
     GF.reset_specific_at_wavelength(
-                     label_has="FE1",tables=local_data.get("Fe_oxidized_model"),newvalue=wavlen[x])
+                     label_has="FE1",tables=local_data.get("Fe_oxidized_model"),newvalue=wavlen[x]) # Fe+3
     GF.reset_specific_at_wavelength(
-                     label_has="FE2",tables=local_data.get("Fe_reduced_model"),newvalue=wavlen[x])
+                     label_has="FE2",tables=local_data.get("Fe_reduced_model"),newvalue=wavlen[x]) # Fe+2
     sfall_channels[x]=GF.get_amplitudes()
+    
+    # newfp,newfdp = local_data.get("Fe_oxidized_model").fp_fdp_at_wavelength(angstroms=wavlen[x])
+    
+    '''
+    # Plot fp and fdp
+    # How to plot the neutral Fe0?
+    fp_oxidized = []
+    fdp_oxidized = []
+    
+    fp_reduced = []
+    fdp_reduced = []
+    wavlen2 = np.linspace(4.5,0.5,5000)
+    for x in range(len(wavlen2)):
+      newfp_o,newfdp_o = local_data.get("Fe_oxidized_model").fp_fdp_at_wavelength(angstroms=wavlen2[x])
+      newfp_r,newfdp_r = local_data.get("Fe_reduced_model").fp_fdp_at_wavelength(angstroms=wavlen2[x])
+
+      fp_oxidized.append(newfp_o)
+      fdp_oxidized.append(newfdp_o)
+      
+      fp_reduced.append(newfp_r)
+      fdp_reduced.append(newfdp_r)
+    
+    fp_oxidized = np.array(fp_oxidized)
+    fdp_oxidized = np.array(fdp_oxidized)
+    
+    fp_reduced = np.array(fp_reduced)
+    fdp_reduced = np.array(fdp_reduced)
+    
+    import matplotlib.pyplot as plt
+    plt.figure()
+    plt.plot(wavlen2, fp_oxidized)
+    plt.plot(wavlen2, fp_reduced)
+    plt.show()
+    
+    plt.figure()
+    plt.plot(wavlen2, fdp_oxidized)
+    plt.plot(wavlen2, fdp_reduced)
+    plt.show()
+    
+    # check kramer's kronig
+    from scipy.signal import hilbert
+    fp_oxidized_kk = hilbert(fdp_oxidized, N=None, axis=- 1)
+    
+    plt.figure()
+    plt.plot(wavlen2, fp_oxidized)
+    plt.plot(wavlen2, np.imag(fp_oxidized_kk)) # XXX curves don't quite match
+    plt.show()
+    
+    # XXX cannot enforce kramer's kronig over a short segment of the function, but can possibly use kramer's kronig as a soft constraint
+    '''
+
+  '''
+    sfall_channels = {}
+    for x in range(len(wavlen)):
+      GF.reset_wavelength(wavlen[x])
+      GF.reset_specific_at_wavelength(
+                       label_has="FE1",tables=local_data.get("Fe_oxidized_model"),newvalue=wavlen[x])
+      GF.reset_specific_at_wavelength(
+                       label_has="FE2",tables=local_data.get("Fe_reduced_model"),newvalue=wavlen[x])
+      sfall_channels[x]=GF.get_amplitudes()
+      
+      # in debugger, can do dir(sfall_channels[0])
+  '''
+
 
   reports = comm.gather(sfall_channels, root = 0)
   if rank==0:
@@ -154,6 +219,8 @@ def run_LY99_batch(test_without_mpi=False):
     from LS49.spectra.generate_spectra import spectra_simulation
     from LS49.adse13_196.revapi.LY99_pad import microcrystal
     print("hello2 from rank %d of %d"%(rank,size))
+    
+    # XXX STOPPED HERE
     SS = spectra_simulation()
     C = microcrystal(Deff_A = 4000, length_um = 4., beam_diameter_um = 1.0) # assume smaller than 10 um crystals
     from LS49 import legacy_random_orientations
@@ -188,6 +255,18 @@ def run_LY99_batch(test_without_mpi=False):
   gpu_channels_singleton = gpu_energy_channels (
     deviceId = gpu_run.get_deviceID())
     # singleton will instantiate, regardless of gpu, device count, or exascale API
+
+
+  '''
+  idx=0
+  image=idx
+  spectra=transmitted_info["spectra"]
+  crystal=transmitted_info["crystal"]
+  random_orientation=transmitted_info["random_orientations"][idx]
+  sfall_channels=transmitted_info["sfall_info"]
+  
+  --> go to tst_one
+  '''
 
   comm.barrier()
   while len(parcels)>0:

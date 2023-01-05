@@ -130,6 +130,7 @@ class gen_fmodel(object):
   def reset_wavelength(self,newvalue):
     scatterers = self.xray_structure.scatterers()
     for sc in scatterers:
+      print(sc)
       from cctbx.eltbx import sasaki, henke
       #expected_sasaki = sasaki.table(sc.element_symbol()).at_angstrom(newvalue)
       expected_henke = henke.table(sc.element_symbol()).at_angstrom(newvalue)
@@ -139,6 +140,7 @@ class gen_fmodel(object):
     scatterers = self.xray_structure.scatterers()
     for sc in scatterers:
       if label_has in sc.label:
+        print(sc)
         newfp,newfdp = tables.fp_fdp_at_wavelength(angstroms=newvalue)
         if verbose:
           print("found",sc.element_symbol(),"label",sc.label, end=' ')
