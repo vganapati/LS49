@@ -22,3 +22,4 @@ srun -n 320 -c 2 dials.stills_process $MODULES/LS49/LY99/saul/index1.phil input.
 # WITH PSF:
 #srun -n 320 -c 2 dials.stills_process ../index1.phil input.glob=../917162/LY99_MPIbatch_*.img.gz
 echo "jobend $(date)";pwd
+
