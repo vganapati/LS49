@@ -2,9 +2,9 @@
 #SBATCH -N 10                # Number of nodes
 #SBATCH -J stills_proc
 #SBATCH -L SCRATCH          # job requires SCRATCH files
-#SBATCH -A m3890_g          # allocation
+#SBATCH -A lcls_g          # allocation
 #SBATCH -C gpu
-#SBATCH -q early_science    # regular queue
+#SBATCH -q regular    # regular queue
 #SBATCH -t 01:00:00         # wall clock time limit
 #SBATCH -o job%j.out
 #SBATCH -e job%j.err
