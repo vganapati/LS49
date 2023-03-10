@@ -2,14 +2,14 @@
 #SBATCH -N 4               # Number of nodes
 #SBATCH -J tdata
 #SBATCH -L SCRATCH          # job requires SCRATCH files
-#SBATCH -A m3890_g          # allocation
+#SBATCH -A lcls_g          # allocation
 #SBATCH -C gpu
-#SBATCH -q early_science    # regular queue
+#SBATCH -q regular    # regular queue
 #SBATCH -t 00:20:00         # wall clock time limit
 #SBATCH -o job%j.out
 #SBATCH -e job%j.err
 
-export WORK=$SCRATCH/adse13_249/LY99
+export WORK=$SCRATCH/cytochrome_sim/LY99
 cd $WORK
 
 mkdir $SLURM_JOB_ID; cd $SLURM_JOB_ID
@@ -17,7 +17,7 @@ mkdir $SLURM_JOB_ID; cd $SLURM_JOB_ID
 export TRIAL=ly99sim
 export OUT_DIR=${PWD}
 # NO PSF:
-export DIALS_OUTPUT=${WORK}/927185
+export DIALS_OUTPUT=${WORK}/5989445
 # WITH PSF:
 #export DIALS_OUTPUT=${WORK}/927187
 
