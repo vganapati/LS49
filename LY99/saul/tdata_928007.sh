@@ -9,7 +9,7 @@
 #SBATCH -o job%j.out
 #SBATCH -e job%j.err
 
-export WORK=$SCRATCH/cytochrome_sim/LY99
+export WORK=$SCRATCH/ferredoxin_sim/LY99
 cd $WORK
 
 mkdir $SLURM_JOB_ID; cd $SLURM_JOB_ID
@@ -17,7 +17,7 @@ mkdir $SLURM_JOB_ID; cd $SLURM_JOB_ID
 export TRIAL=ly99sim
 export OUT_DIR=${PWD}
 # NO PSF:
-export DIALS_OUTPUT=${WORK}/5989445
+export DIALS_OUTPUT=${WORK}/6443545
 # WITH PSF:
 #export DIALS_OUTPUT=${WORK}/927187
 
