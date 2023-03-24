@@ -47,7 +47,7 @@ integration {
   }
 }
 profile.gaussian_rs.centroid_definition=com
-#dispatch.pre_import=True # would otherwise import every nanoBragg image in every rank
+dispatch.pre_import=True # would otherwise import every nanoBragg image in every rank
 #output.composite_output=True
 output.logging_dir=. # demangle by rank
 
