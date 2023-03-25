@@ -9,7 +9,7 @@
 #SBATCH -o job%j.out
 #SBATCH -e job%j.err
 
-export WORK=$SCRATCH/cytochrome_sim/LY99
+export WORK=$SCRATCH/ferredoxin_sim/LY99
 cd $WORK
 
 mkdir $SLURM_JOB_ID; cd $SLURM_JOB_ID
@@ -17,7 +17,7 @@ mkdir $SLURM_JOB_ID; cd $SLURM_JOB_ID
 export TRIAL=ly99sim
 export OUT_DIR=${PWD}
 # NO PSF:
-export DIALS_OUTPUT=${WORK}/5989445
+export DIALS_OUTPUT=${WORK}/6443545
 # WITH PSF:
 # export DIALS_OUTPUT=${WORK}/927187
 
@@ -27,7 +27,7 @@ input.reflections_suffix=_integrated.refl
 input.parallel_file_load.method=uniform
 filter.algorithm=unit_cell
 filter.unit_cell.algorithm=cluster
-filter.unit_cell.cluster.covariance.file=/global/cfs/cdirs/m3562/users/vidyagan/p20231/LS49_output/covariance_ly99sim_cells.pickle
+filter.unit_cell.cluster.covariance.file=/global/cfs/cdirs/m3562/users/vidyagan/p20231/LS49_output/h5_processing/covariance_ly99sim_cells.pickle
 filter.unit_cell.cluster.covariance.component=0
 filter.unit_cell.cluster.covariance.mahalanobis=4.0
 filter.outlier.min_corr=-1.0
