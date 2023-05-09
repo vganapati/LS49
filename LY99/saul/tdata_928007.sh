@@ -2,7 +2,7 @@
 #SBATCH -N 4               # Number of nodes
 #SBATCH -J tdata
 #SBATCH -L SCRATCH          # job requires SCRATCH files
-#SBATCH -A lcls_g          # allocation
+#SBATCH -A m2859_g          # allocation
 #SBATCH -C gpu
 #SBATCH -q regular    # regular queue
 #SBATCH -t 00:20:00         # wall clock time limit
