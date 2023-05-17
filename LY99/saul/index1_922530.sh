@@ -18,7 +18,7 @@ echo "jobstart $(date)";pwd
 # one hour, 10 nodes should suffice
 # NO PSF:
 #srun -n 320 -c 2 dials.stills_process $MODULES/LS49/LY99/saul/index1.phil input.glob=../../6383589/LY99_MPIbatch_*.img.gz
-srun -n 320 -c 2 dials.stills_process $MODULES/LS49/LY99/saul/index1.phil input.glob=../../6383589/image_rank_*.h5
+srun -n 320 -c 4 dials.stills_process $MODULES/LS49/LY99/saul/index1.phil input.glob=../../6383589/image_rank_*.h5
 
 # WITH PSF:
 #srun -n 320 -c 2 dials.stills_process ../index1.phil input.glob=../917162/LY99_MPIbatch_*.img.gz
